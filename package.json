@@ -1,6 +1,6 @@
 {
   "name": "opencode-agents-monitor",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "description": "OpenCode TUI plugin — live sub-agent status in the sidebar",
   "author": "Dqz00116",
