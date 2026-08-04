@@ -17,6 +17,7 @@ type Tracker = {
   run: (sessionID: string) => Run | undefined
   history: (sessionID: string) => History | undefined
   now: () => number
+  breathing: () => number
   collapsed: () => boolean
   toggleCollapsed: () => void
   showArchived: () => boolean
@@ -77,6 +78,7 @@ function createTracker(api: TuiPluginApi): Tracker {
     const [history, setHistory] = createSignal<Record<string, History>>({})
     const hydrated = new Set<string>()
     const [now, setNow] = createSignal(Date.now())
+    const [breathing, setBreathing] = createSignal(0)
     const [collapsed, setCollapsed] = createSignal(!!api.kv.get(KV_COLLAPSED, true))
     const [showArchived, setShowArchived] = createSignal(!!api.kv.get(KV_ARCHIVED, false))
     const [expandedMap, setExpandedMap] = createSignal<Record<string, boolean>>({})
@@ -138,6 +140,7 @@ function createTracker(api: TuiPluginApi): Tracker {
       .catch(() => {})
 
     const timer = setInterval(() => setNow(Date.now()), 1000)
+    const breathingTimer = setInterval(() => setBreathing((value) => value + 1), 400)
 
     createEffect(() => {
       for (const child of Object.values(sessions())) {
@@ -175,6 +178,7 @@ function createTracker(api: TuiPluginApi): Tracker {
         return history()[sessionID]
       },
       now,
+      breathing,
       collapsed,
       toggleCollapsed() {
         const next = !collapsed()
@@ -279,7 +283,7 @@ function Agent(props: { api: TuiPluginApi; tracker: Tracker; session: Session })
   const open = createMemo(() => props.tracker.expanded(props.session.id, false))
 
   // Breathing indicator (ASCII only), driven by the tracker's 1s `now` tick.
-  const phase = createMemo(() => Math.floor(props.tracker.now() / 1000) % 4)
+  const phase = createMemo(() => props.tracker.breathing() % 4)
   const indicator = createMemo(() => {
     const label = state().label
     if (label === "retry") return phase() % 2 === 0 ? "!" : "."
