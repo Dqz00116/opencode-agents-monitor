@@ -1,0 +1,29 @@
+{
+  "name": "opencode-agents-sidebar",
+  "version": "0.1.0",
+  "description": "OpenCode TUI plugin — live sub-agent status in the sidebar",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    "./tui": "./src/index.tsx"
+  },
+  "engines": {
+    "opencode": ">=1.18.0"
+  },
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "tui",
+    "subagent",
+    "sidebar"
+  ],
+  "files": [
+    "src",
+    "assets"
+  ],
+  "devDependencies": {
+    "@opencode-ai/plugin": "^1.18.1",
+    "solid-js": "^1.9.12",
+    "@opentui/solid": "^0.3.4"
+  }
+}
