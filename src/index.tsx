@@ -7,6 +7,7 @@ type Run = { start: number; end?: number }
 
 const KV_COLLAPSED = "agents_sidebar.collapsed"
 const KV_ARCHIVED = "agents_sidebar.show_archived"
+const ARCHIVED_PAGE_SIZE = 10
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" })
 
@@ -22,6 +23,8 @@ type Tracker = {
   toggleArchived: () => void
   expanded: (sessionID: string, fallback: boolean) => boolean
   toggleExpanded: (sessionID: string, fallback: boolean) => void
+  archivedPage: (sessionID: string) => number
+  setArchivedPage: (sessionID: string, page: number) => void
 }
 
 type History = { ctx?: number; elapsed?: number }
@@ -34,7 +37,7 @@ function agentName(session: Session) {
 
 function agentDesc(session: Session) {
   const desc = session.title.replace(/\s*\(@[^\s()]+\s+subagent\)\s*$/, "")
-  return desc.length > 30 ? `${desc.slice(0, 29)}~` : desc
+  return desc.length > 38 ? `${desc.slice(0, 37)}~` : desc
 }
 
 function formatTokens(value: number) {
@@ -77,6 +80,7 @@ function createTracker(api: TuiPluginApi): Tracker {
     const [collapsed, setCollapsed] = createSignal(!!api.kv.get(KV_COLLAPSED, true))
     const [showArchived, setShowArchived] = createSignal(!!api.kv.get(KV_ARCHIVED, false))
     const [expandedMap, setExpandedMap] = createSignal<Record<string, boolean>>({})
+    const [archivedPageMap, setArchivedPageMap] = createSignal<Record<string, number>>({})
 
     function track(session: Session) {
       if (!session.parentID) return
@@ -190,6 +194,21 @@ function createTracker(api: TuiPluginApi): Tracker {
         const next = !(expandedMap()[sessionID] ?? fallback)
         setExpandedMap((current) => ({ ...current, [sessionID]: next }))
       },
+      archivedPage(sessionID) {
+        const total = Object.values(sessions()).filter(
+          (session) => session.parentID === sessionID && isDone(session),
+        ).length
+        const pages = Math.max(1, Math.ceil(total / ARCHIVED_PAGE_SIZE))
+        return Math.min(archivedPageMap()[sessionID] ?? 0, pages - 1)
+      },
+      setArchivedPage(sessionID, page) {
+        const total = Object.values(sessions()).filter(
+          (session) => session.parentID === sessionID && isDone(session),
+        ).length
+        const pages = Math.max(1, Math.ceil(total / ARCHIVED_PAGE_SIZE))
+        const clamped = Math.max(0, Math.min(page, pages - 1))
+        setArchivedPageMap((current) => ({ ...current, [sessionID]: clamped }))
+      },
     }
   })
 }
@@ -226,6 +245,16 @@ function Agent(props: { api: TuiPluginApi; tracker: Tracker; session: Session })
     if (lastAssistant()?.finish) return { label: "done", color: theme().textMuted }
     return { label: "idle", color: theme().textMuted }
   })
+  const stateAbbr = createMemo(() => {
+    const table: Record<string, string> = {
+      thinking: "think",
+      tool: "tool",
+      done: "done",
+      idle: "idle",
+      retry: "retry",
+    }
+    return table[state().label] ?? state().label
+  })
   const model = createMemo(() => lastAssistant()?.modelID ?? props.session.model?.id ?? "?")
   const ctx = createMemo(() => {
     const item = messages().findLast(
@@ -248,15 +277,15 @@ function Agent(props: { api: TuiPluginApi; tracker: Tracker; session: Session })
     return props.tracker.history(props.session.id)?.elapsed
   })
   const open = createMemo(() => props.tracker.expanded(props.session.id, false))
-  const idle = () => state().label === "done" || state().label === "idle"
-  const summary = createMemo(() =>
-    [
-      state().label,
-      elapsedMs() !== undefined ? formatElapsed(elapsedMs()!) : undefined,
-    ]
-      .filter(Boolean)
-      .join(" "),
-  )
+
+  // Breathing indicator (ASCII only), driven by the tracker's 1s `now` tick.
+  const phase = createMemo(() => Math.floor(props.tracker.now() / 1000) % 4)
+  const indicator = createMemo(() => {
+    const label = state().label
+    if (label === "retry") return phase() % 2 === 0 ? "!" : "."
+    if (label === "thinking" || label === "tool") return [".", "o", "O", "o"][phase()]
+    return "-"
+  })
 
   return (
     <box marginBottom={1}>
@@ -266,31 +295,24 @@ function Agent(props: { api: TuiPluginApi; tracker: Tracker; session: Session })
           gap={1}
           onMouseDown={() => props.tracker.toggleExpanded(props.session.id, false)}
         >
-          <text fg={state().color}>{state().label.startsWith("retry") ? "!" : idle() ? "-" : "*"}</text>
+          <text fg={state().color}>{indicator()}</text>
           <text fg={theme().text}>
             <b>[{agentName(props.session)}]</b>
           </text>
-          <Show when={!open()}>
-            <text fg={theme().textMuted}>{summary()}</text>
-          </Show>
+          <text fg={theme().textMuted}>
+            {stateAbbr()} {ctx() !== undefined ? formatTokens(ctx()!) : "-"}{" "}
+            {elapsedMs() !== undefined ? formatElapsed(elapsedMs()!) : "-"}
+          </text>
         </box>
         <box onMouseDown={() => api.route.navigate("session", { sessionID: props.session.id })}>
           <text fg={theme().primary}>[view]</text>
         </box>
       </box>
+      <text fg={theme().textMuted}>  {agentDesc(props.session)}</text>
       <Show when={open()}>
-        <box flexDirection="row" gap={1}>
-          <text fg={theme().textMuted}>state:</text>
-          <text fg={state().color}>{state().label}</text>
-        </box>
-        <text fg={theme().textMuted}>model: {model()}</text>
-        <text fg={theme().textMuted}>ctx: {ctx() !== undefined ? formatTokens(ctx()!) : "-"}</text>
-        <text fg={theme().textMuted}>tool: {tool() ? toolSummary(tool()!) : "-"}</text>
-        <text fg={theme().textMuted}>
-          elapsed: {elapsedMs() !== undefined ? formatElapsed(elapsedMs()!) : "-"}
-        </text>
-        <text fg={theme().textMuted}>desc: {agentDesc(props.session)}</text>
-        <text fg={theme().textMuted}>cost: {money.format(props.session.cost ?? 0)}</text>
+        <text fg={theme().textMuted}>  model: {model()}</text>
+        <text fg={theme().textMuted}>  tool: {tool() ? toolSummary(tool()!) : "-"}</text>
+        <text fg={theme().textMuted}>  cost: {money.format(props.session.cost ?? 0)}</text>
       </Show>
     </box>
   )
@@ -301,6 +323,12 @@ function View(props: { api: TuiPluginApi; tracker: Tracker; session_id: string }
   const active = createMemo(() => props.tracker.active(props.session_id))
   const archived = createMemo(() => props.tracker.archived(props.session_id))
   const total = () => active().length + archived().length
+  const archivedTotalPages = createMemo(() => Math.max(1, Math.ceil(archived().length / ARCHIVED_PAGE_SIZE)))
+  const archivedPage = createMemo(() => props.tracker.archivedPage(props.session_id))
+  const archivedItems = createMemo(() => {
+    const start = archivedPage() * ARCHIVED_PAGE_SIZE
+    return archived().slice(start, start + ARCHIVED_PAGE_SIZE)
+  })
 
   return (
     <box marginBottom={1}>
@@ -324,9 +352,28 @@ function View(props: { api: TuiPluginApi; tracker: Tracker; session_id: string }
               <text fg={theme().textMuted}>Archived ({archived().length})</text>
             </box>
             <Show when={props.tracker.showArchived()}>
-              <For each={archived()}>
+              <For each={archivedItems()}>
                 {(child) => <Agent api={props.api} tracker={props.tracker} session={child} />}
               </For>
+              <Show when={archivedTotalPages() > 1}>
+                <box flexDirection="row" gap={1}>
+                  <text
+                    fg={archivedPage() > 0 ? theme().primary : theme().textMuted}
+                    onMouseDown={() => props.tracker.setArchivedPage(props.session_id, archivedPage() - 1)}
+                  >
+                    [&lt;]
+                  </text>
+                  <text fg={theme().textMuted}>
+                    {archivedPage() + 1}/{archivedTotalPages()}
+                  </text>
+                  <text
+                    fg={archivedPage() < archivedTotalPages() - 1 ? theme().primary : theme().textMuted}
+                    onMouseDown={() => props.tracker.setArchivedPage(props.session_id, archivedPage() + 1)}
+                  >
+                    [&gt;]
+                  </text>
+                </box>
+              </Show>
             </Show>
           </Show>
         </Show>
