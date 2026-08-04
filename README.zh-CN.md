@@ -7,11 +7,11 @@
 </p>
 <p align="center">在 OpenCode 侧边栏实时观察子代理的运行状态。</p>
 <p align="center">
-  <a href="https://www.npmjs.com/package/opencode-agents-sidebar"><img alt="npm" src="https://img.shields.io/npm/v/opencode-agents-sidebar?style=flat-square" /></a>
-  <a href="https://github.com/Dqz00116/opencode-agents-sidebar/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" /></a>
+  <a href="https://www.npmjs.com/package/opencode-agents-monitor"><img alt="npm" src="https://img.shields.io/npm/v/opencode-agents-monitor?style=flat-square" /></a>
+  <a href="https://github.com/Dqz00116/opencode-agents-monitor/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" /></a>
 </p>
 <p align="center">
-  <a href="README.md">English</a> | <a href="README.zh.md">简体中文</a>
+  <a href="README.md">English</a> | 中文
 </p>
 
 ---
@@ -20,8 +20,10 @@
 让你实时掌握当前会话派生的每个子代理：它在做什么、用哪个模型、
 烧了多少上下文、已经跑了多久。
 
+**它与众不同之处：** 其他侧边栏插件只是*列出*你的代理——这个插件展示的是它们**此刻正在做什么**。实时的 `session.status` 事件驱动五种状态（`thinking` / `tool` / `retry` / `done` / `idle`），**当前工具调用**在运行期间即可实时可见，而 TUI 启动之前就已结束的代理也会通过 API **水合（hydrated）**，因此上下文与耗时信息永不丢失。
+
 <p align="center">
-  <img src="assets/opencode-agents-sidebar.gif" alt="opencode-agents-sidebar 演示">
+  <img src="assets/opencode-agents-monitor.gif" alt="opencode-agents-monitor 演示">
 </p>
 
 ### 特性
@@ -42,7 +44,7 @@
 ### 安装
 
 ```bash
-opencode plugin opencode-agents-sidebar
+opencode plugin opencode-agents-monitor
 ```
 
 安装后重启 OpenCode。组件位于会话侧边栏——
@@ -55,7 +57,7 @@ opencode plugin opencode-agents-sidebar
 
 ```json
 {
-  "plugin": ["opencode-agents-sidebar"]
+  "plugin": ["opencode-agents-monitor"]
 }
 ```
 
@@ -87,8 +89,8 @@ opencode plugin opencode-agents-sidebar
 ### 开发
 
 ```bash
-git clone https://github.com/Dqz00116/opencode-agents-sidebar
-cd opencode-agents-sidebar
+git clone https://github.com/Dqz00116/opencode-agents-monitor
+cd opencode-agents-monitor
 bun install
 ```
 
@@ -96,7 +98,7 @@ bun install
 
 ```json
 {
-  "plugin": ["./path/to/opencode-agents-sidebar/src/index.tsx"]
+  "plugin": ["./path/to/opencode-agents-monitor/src/index.tsx"]
 }
 ```
 

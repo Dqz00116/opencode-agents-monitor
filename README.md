@@ -7,11 +7,11 @@
 </p>
 <p align="center">Live sub-agent status in the OpenCode sidebar.</p>
 <p align="center">
-  <a href="https://www.npmjs.com/package/opencode-agents-sidebar"><img alt="npm" src="https://img.shields.io/npm/v/opencode-agents-sidebar?style=flat-square" /></a>
-  <a href="https://github.com/Dqz00116/opencode-agents-sidebar/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" /></a>
+  <a href="https://www.npmjs.com/package/opencode-agents-monitor"><img alt="npm" src="https://img.shields.io/npm/v/opencode-agents-monitor?style=flat-square" /></a>
+  <a href="https://github.com/Dqz00116/opencode-agents-monitor/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" /></a>
 </p>
 <p align="center">
-  <a href="README.md">English</a> | <a href="README.zh.md">简体中文</a>
+  English | <a href="README.zh-CN.md">中文</a>
 </p>
 
 ---
@@ -20,8 +20,10 @@ An [OpenCode](https://opencode.ai) TUI plugin that adds an **Agents** widget to 
 sidebar, so you can watch every sub-agent your session spawns — what it's doing, which
 model it runs on, how much context it has burned, and how long it has been at it.
 
+**What makes it different:** other sidebar plugins *list* your agents — this one shows you **what they are doing right now**. Live `session.status` events drive five states (`thinking` / `tool` / `retry` / `done` / `idle`), the **current tool call** is visible while it is still running, and finished agents from before the TUI started are **hydrated** from the API so context and elapsed time are never lost.
+
 <p align="center">
-  <img src="assets/opencode-agents-sidebar.gif" alt="opencode-agents-sidebar demo">
+  <img src="assets/opencode-agents-monitor.gif" alt="opencode-agents-monitor demo">
 </p>
 
 ### Features
@@ -42,7 +44,7 @@ model it runs on, how much context it has burned, and how long it has been at it
 ### Installation
 
 ```bash
-opencode plugin opencode-agents-sidebar
+opencode plugin opencode-agents-monitor
 ```
 
 Restart OpenCode afterwards. The widget lives in the session sidebar —
@@ -55,7 +57,7 @@ Add to `~/.config/opencode/tui.json` (global) or `.opencode/tui.json` (project):
 
 ```json
 {
-  "plugin": ["opencode-agents-sidebar"]
+  "plugin": ["opencode-agents-monitor"]
 }
 ```
 
@@ -89,8 +91,8 @@ Status markers: `*` active · `!` retrying · `-` idle / done.
 ### Development
 
 ```bash
-git clone https://github.com/Dqz00116/opencode-agents-sidebar
-cd opencode-agents-sidebar
+git clone https://github.com/Dqz00116/opencode-agents-monitor
+cd opencode-agents-monitor
 bun install
 ```
 
@@ -98,7 +100,7 @@ Add it to your `tui.json` as a file plugin while hacking:
 
 ```json
 {
-  "plugin": ["./path/to/opencode-agents-sidebar/src/index.tsx"]
+  "plugin": ["./path/to/opencode-agents-monitor/src/index.tsx"]
 }
 ```
 
