@@ -20,25 +20,9 @@
 让你实时掌握当前会话派生的每个子代理：它在做什么、用哪个模型、
 烧了多少上下文、已经跑了多久。
 
-```
-▼ Agents 2 active 1 done
-* [explore] thinking 02:31      [view]
-* [coder] tool 00:48            [view]
-▶ Archived (1)
-```
-
-点击代理行可展开详情：
-
-```
-* [coder]                       [view]
-state: tool
-model: claude-sonnet-4-5
-ctx: 32k
-tool: bash npm test
-elapsed: 00:48
-desc: Catalog sidebar components
-cost: $0.0123
-```
+<p align="center">
+  <img src="assets/opencode-agents-sidebar.gif" alt="opencode-agents-sidebar 演示">
+</p>
 
 ### 特性
 

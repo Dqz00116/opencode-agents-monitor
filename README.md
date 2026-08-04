@@ -20,25 +20,9 @@ An [OpenCode](https://opencode.ai) TUI plugin that adds an **Agents** widget to 
 sidebar, so you can watch every sub-agent your session spawns — what it's doing, which
 model it runs on, how much context it has burned, and how long it has been at it.
 
-```
-▼ Agents 2 active 1 done
-* [explore] thinking 02:31      [view]
-* [coder] tool 00:48            [view]
-▶ Archived (1)
-```
-
-Click a row to expand the details:
-
-```
-* [coder]                       [view]
-state: tool
-model: claude-sonnet-4-5
-ctx: 32k
-tool: bash npm test
-elapsed: 00:48
-desc: Catalog sidebar components
-cost: $0.0123
-```
+<p align="center">
+  <img src="assets/opencode-agents-sidebar.gif" alt="opencode-agents-sidebar demo">
+</p>
 
 ### Features
 
