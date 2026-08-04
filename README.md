@@ -107,6 +107,18 @@ Add it to your `tui.json` as a file plugin while hacking:
 The logo is generated: `node script/logo.mjs` (pixel wordmark in the opencode
 ornate style).
 
+### Build & publish (npm install path)
+
+The published package must ship a compiled ESM entry — the host only applies its
+Solid JSX transform to files outside `node_modules`, so a raw `src/index.tsx` as
+the `./tui` export is silently dropped at load. Build with:
+
+    bun install
+    bun run build   # writes dist/index.js
+
+Then publish `npm publish` (requires `npm login`). The file-plugin dev flow above
+stays valid for local testing.
+
 ### License
 
 MIT

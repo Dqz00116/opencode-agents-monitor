@@ -300,20 +300,21 @@ function View(props: { api: TuiPluginApi; tracker: Tracker; session_id: string }
   const theme = () => props.api.theme.current
   const active = createMemo(() => props.tracker.active(props.session_id))
   const archived = createMemo(() => props.tracker.archived(props.session_id))
+  const total = () => active().length + archived().length
 
   return (
-    <Show when={active().length + archived().length > 0}>
-      <box marginBottom={1}>
-        <box flexDirection="row" gap={1} onMouseDown={() => props.tracker.toggleCollapsed()}>
-          <text fg={theme().text}>{props.tracker.collapsed() ? "▶" : "▼"}</text>
-          <text fg={theme().text}>
-            <b>Agents</b>
-          </text>
-          <text fg={theme().textMuted}>
-            {active().length} active {archived().length} done
-          </text>
-        </box>
-        <Show when={!props.tracker.collapsed()}>
+    <box marginBottom={1}>
+      <box flexDirection="row" gap={1} onMouseDown={() => props.tracker.toggleCollapsed()}>
+        <text fg={theme().text}>{props.tracker.collapsed() ? "▶" : "▼"}</text>
+        <text fg={theme().text}>
+          <b>Agents</b>
+        </text>
+        <text fg={theme().textMuted}>
+          {active().length} active {archived().length} done
+        </text>
+      </box>
+      <Show when={!props.tracker.collapsed()}>
+        <Show when={total() > 0} fallback={<text fg={theme().textMuted}>No subagents yet</text>}>
           <For each={active()}>
             {(child) => <Agent api={props.api} tracker={props.tracker} session={child} />}
           </For>
@@ -329,8 +330,8 @@ function View(props: { api: TuiPluginApi; tracker: Tracker; session_id: string }
             </Show>
           </Show>
         </Show>
-      </box>
-    </Show>
+      </Show>
+    </box>
   )
 }
 

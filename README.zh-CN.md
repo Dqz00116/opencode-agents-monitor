@@ -104,6 +104,17 @@ bun install
 
 Logo 由脚本生成：`node script/logo.mjs`（opencode ornate 风格的像素字标）。
 
+### 构建与发布（npm 安装路径）
+
+发布的包必须包含编译后的 ESM 入口 —— 宿主只对 `node_modules` 之外的文件应用
+Solid JSX 转换，因此把原始 `src/index.tsx` 作为 `./tui` 导出会在加载时被静默丢弃。
+构建命令：
+
+    bun install
+    bun run build   # 生成 dist/index.js
+
+然后发布：`npm publish`（需要先 `npm login`）。上面的文件插件开发流程仍可用于本地测试。
+
 ### 许可证
 
 MIT

@@ -1,6 +1,7 @@
 {
   "name": "opencode-agents-monitor",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "type": "module",
   "description": "OpenCode TUI plugin — live sub-agent status in the sidebar",
   "author": "Dqz00116",
   "license": "MIT",
@@ -23,15 +24,18 @@
     "opencode": ">=1.18.0"
   },
   "exports": {
-    "./tui": "./src/index.tsx"
+    "./tui": "./dist/index.js"
   },
   "files": [
-    "src",
+    "dist",
     "assets"
   ],
+  "scripts": {
+    "build": "bun run script/build.mjs"
+  },
   "dependencies": {
     "@opencode-ai/plugin": "^1.18.1",
     "solid-js": "^1.9.12",
-    "@opentui/solid": "^0.3.4"
+    "@opentui/solid": "^0.5.1"
   }
 }
