@@ -10,6 +10,9 @@
   <a href="https://www.npmjs.com/package/opencode-agents-sidebar"><img alt="npm" src="https://img.shields.io/npm/v/opencode-agents-sidebar?style=flat-square" /></a>
   <a href="https://github.com/Dqz00116/opencode-agents-sidebar/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" /></a>
 </p>
+<p align="center">
+  <a href="README.md">English</a> | <a href="README.zh.md">简体中文</a>
+</p>
 
 ---
 
