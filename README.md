@@ -5,7 +5,7 @@
     <img src="assets/logo-light.svg" alt="agents logo">
   </picture>
 </p>
-<p align="center">Live sub-agent status in the OpenCode sidebar.</p>
+<p align="center">Keep every OpenCode sub-agent in sight.</p>
 <p align="center">
   <a href="https://www.npmjs.com/package/opencode-agents-monitor"><img alt="npm" src="https://img.shields.io/npm/v/opencode-agents-monitor?style=flat-square" /></a>
   <a href="https://github.com/Dqz00116/opencode-agents-monitor/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" /></a>
@@ -16,39 +16,36 @@
 
 ---
 
-An [OpenCode](https://opencode.ai) TUI plugin that adds an **Agents** widget to the session
-sidebar, so you can watch every sub-agent your session spawns — what it's doing, which
-model it runs on, how much context it has burned, and how long it has been at it.
+An [OpenCode](https://opencode.ai) TUI plugin that brings live sub-agent progress straight into the session sidebar. See which agents are still working, what each one is doing, and the elapsed time, context, and cost for each, all without leaving your main session.
 
-**What makes it different:** other sidebar plugins *list* your agents — this one shows you **what they are doing right now**. Live `session.status` events drive five states (`thinking` / `tool` / `retry` / `done` / `idle`), the **current tool call** is visible while it is still running, and finished agents from before the TUI started are **hydrated** from the API so context and elapsed time are never lost.
+Expand an agent for its model, current tool, and cost. When you need the full story, open the child session directly from the sidebar.
 
 <p align="center">
-  <img src="assets/opencode-agents-monitor.gif" alt="opencode-agents-monitor demo">
+  <img src="assets/opencode-agents-monitor.gif" alt="Agents sidebar tracking active and completed OpenCode sub-agents">
 </p>
 
-### Features
+### Why use it?
 
-- **Live status per sub-agent** — `thinking` / `tool` / `retry` / `done` / `idle`,
-  driven by the server's `session.status` event stream
-- **Current tool call** — see `bash npm test` while it's still running
-- **Context & cost** — token usage and spend per agent
-- **Elapsed timer** — starts when the agent goes busy, freezes when it's done
-- **Auto-archive** — finished agents fold into `Archived (n)`, sorted by completion time
-- **Click to expand** — rows collapse to a one-line summary by default
-- **Jump into the agent** — the `[view]` button opens the agent's own session view
-  (same as the built-in "Go to child session"); press `up` to come back
-- **History hydration** — agents from before the current TUI was started still get
-  `ctx` / `elapsed`, fetched lazily from the API
-- **Flicker-free** — fixed-height rows and a fixed-width layout that fits the sidebar
+Once a session fans out across several tasks, it becomes hard to tell what is still moving and what has already finished. The widget keeps that picture visible: active work updates in real time, completed agents move out of the way, and earlier child sessions reappear when the TUI starts.
+
+### What you get
+
+- **Live progress at a glance:** distinguish `thinking`, `tool`, `retry`, `done`, and `idle` states as they change
+- **The current tool, while it runs:** see a concise call such as `bash npm test` before it finishes
+- **Useful numbers, not noise:** context, elapsed time, model, and cost for each agent
+- **A tidy long-running session:** completed agents are sorted into the paginated `Archived (n)` section automatically
+- **Details on demand:** keep rows compact, expand the ones you care about, or use `[view]` to open the full child session; press `up` to return
+- **History after a restart:** context and elapsed time for earlier agents are restored lazily from the API
 
 ### Installation
+
+Requires OpenCode 1.18.0 or later.
 
 ```bash
 opencode plugin opencode-agents-monitor
 ```
 
-Restart OpenCode afterwards. The widget lives in the session sidebar —
-press `ctrl+x` then `b` if the sidebar is hidden.
+Restart OpenCode after installation. The widget appears in the session sidebar; press `ctrl+x`, then `b` if the sidebar is hidden.
 
 <details>
 <summary>Manual installation</summary>
@@ -67,26 +64,21 @@ Add to `~/.config/opencode/tui.json` (global) or `.opencode/tui.json` (project):
 
 | Action | Result |
 | --- | --- |
-| Click `Agents` header | Collapse / expand the whole widget (persists) |
-| Click an agent row | Expand details / collapse to one-line summary |
-| Click `[view]` | Open that agent's session (messages, tools, everything) |
-| Click `Archived (n)` | Show / hide finished agents (persists) |
+| Click the `Agents` header | Collapse or expand the entire widget (persists) |
+| Click an agent row | Show or hide its model, current tool, and cost |
+| Click `[view]` | Open the agent's complete child session |
+| Click `Archived (n)` | Show or hide completed agents (persists) |
+| Click `[<]` / `[>]` | Move through archived pages |
 
-Status markers: `*` active · `!` retrying · `-` idle / done.
+Status markers breathe while an agent is active; `!` means retrying, and `-` means idle or done.
 
 ### How it works
 
-- Registers into the TUI's `sidebar_content` slot — the same extension point the
-  built-in Context / Todo widgets use. No patched host code.
-- Tracks child sessions (`parentID`) via `session.created` / `session.updated` /
-  `session.deleted` events plus one initial `session.list()`.
-- Live state comes from `session.status` events (`busy` / `retry` / `idle`) and the
-  shared message store; the current tool is the last `tool` part of the latest
-  assistant message.
-- Finished agents are hydrated once via `session.messages` so historical sessions
-  still report context size and elapsed time.
-- All widget state lives outside the slot component tree, so the slot registry's
-  renderer re-invocation never loses state.
+- Uses the TUI's official `sidebar_content` slot, the same extension point as the built-in Context and Todo widgets. No host patching required.
+- Finds child sessions (`parentID`) from `session.created`, `session.updated`, and `session.deleted` events, plus one initial `session.list()` call.
+- Combines `session.status` events (`busy` / `retry` / `idle`) with the shared message store to show live state and the latest tool call.
+- Fetches `session.messages` once for completed agents when needed, restoring context size and elapsed time for historical sessions.
+- Keeps widget state outside the slot component tree, so slot re-renders do not reset your expanded and archived preferences.
 
 ### Development
 
@@ -96,7 +88,7 @@ cd opencode-agents-monitor
 bun install
 ```
 
-Add it to your `tui.json` as a file plugin while hacking:
+Reference the source from `tui.json` while developing locally:
 
 ```json
 {
@@ -104,20 +96,18 @@ Add it to your `tui.json` as a file plugin while hacking:
 }
 ```
 
-The logo is generated: `node script/logo.mjs` (pixel wordmark in the opencode
-ornate style).
+After changing the logo source, regenerate both variants with `node script/logo.mjs`.
 
-### Build & publish (npm install path)
+### Publishing
 
-The published package must ship a compiled ESM entry — the host only applies its
-Solid JSX transform to files outside `node_modules`, so a raw `src/index.tsx` as
-the `./tui` export is silently dropped at load. Build with:
+The npm package must ship a compiled ESM entry. The host only applies its Solid JSX transform outside `node_modules`, so exporting raw `src/index.tsx` would cause the plugin to be skipped during loading.
 
-    bun install
-    bun run build   # writes dist/index.js
+```bash
+bun install
+bun run build # writes dist/index.js
+```
 
-Then publish `npm publish` (requires `npm login`). The file-plugin dev flow above
-stays valid for local testing.
+Run `npm publish` after `npm login`. The source-based file-plugin setup above remains the recommended local development flow.
 
 ### License
 
