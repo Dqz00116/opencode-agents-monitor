@@ -1,6 +1,6 @@
 {
   "name": "opencode-agents-monitor",
-  "version": "0.1.2",
+  "version": "0.2.0-beta.0",
   "type": "module",
   "description": "OpenCode TUI plugin — live sub-agent status in the sidebar",
   "author": "Dqz00116",
@@ -21,21 +21,27 @@
     "sidebar"
   ],
   "engines": {
-    "opencode": ">=1.18.0"
+    "opencode": ">=2.0.0"
   },
   "exports": {
     "./tui": "./dist/index.js"
   },
   "files": [
     "dist",
-    "assets"
+    "assets",
+    "tui.js"
   ],
   "scripts": {
     "build": "bun run script/build.mjs"
   },
   "dependencies": {
-    "@opencode-ai/plugin": "^1.18.1",
+    "@opencode/plugin": "^2.0.15",
     "solid-js": "^1.9.12",
     "@opentui/solid": "^0.5.1"
+  },
+  "peerDependencies": {
+    "solid-js": ">=1.9.0",
+    "@opentui/core": ">=0.5.10",
+    "@opentui/solid": ">=0.5.10"
   }
 }

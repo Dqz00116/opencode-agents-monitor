@@ -22,6 +22,9 @@ const RUNTIME_SPECIFIERS = new Set([
   "@opentui/core/testing",
   "solid-js",
   "solid-js/store",
+  // The v2 TUI plugin API must be the host's instance (its Solid context object
+  // is module-level), so it is provided as a runtime module like solid-js.
+  "@opencode/plugin/tui",
 ])
 
 const result = await Bun.build({
