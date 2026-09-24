@@ -39,12 +39,12 @@
 
 ### 兼容性
 
-两条版本线使用不同的插件 API，互不通用：`0.2.x` 面向 OpenCode v2 API（`@opencode/plugin@2`、`Plugin.define`），`0.1.2` 则是最后一个基于 v1 插件形态（`@opencode-ai/plugin/tui`）的版本。
+两条版本线使用不同的插件 API，互不通用：`0.2.x` 面向 OpenCode v2 API（`@opencode/plugin@2`、`Plugin.define`），`0.1.2` 则基于 v1 插件形态（`@opencode-ai/plugin/tui`）。两条版本线都会长期维护支持。
 
 | 插件版本 | OpenCode 版本 | 安装方式 | 配置文件 |
 | --- | --- | --- | --- |
 | `0.2.x`（`latest`） | v2（`2.0.0+`） | `opencode plugin add opencode-agents-monitor` | 全局 `~/.config/opencode/cli.json` → `"plugins"` |
-| `0.1.2`（legacy，`opencode-v1` dist-tag） | v1（`1.18.0+`） | `opencode plugin opencode-agents-monitor@0.1.2` | `tui.json` → `"plugin"`（全局或项目级） |
+| `0.1.2`（v1 版本线，长期维护，`opencode-v1` dist-tag） | v1（`1.18.0+`） | `opencode plugin opencode-agents-monitor@0.1.2` | `tui.json` → `"plugin"`（全局或项目级） |
 
 npm 上 `latest` 跟随 `0.2.x` 版本线，`0.1.2` 则保留在 `opencode-v1` dist-tag 下。
 
@@ -67,7 +67,7 @@ opencode plugin add opencode-agents-monitor
 安装后重启 OpenCode。组件会出现在会话侧栏中；如果侧栏处于隐藏状态，先按 `ctrl+x`，再按 `b` 打开。
 
 <details>
-<summary>OpenCode v1（legacy）</summary>
+<summary>OpenCode v1 版本线（长期维护）</summary>
 
 OpenCode v1 通过 `tui.json` 的 `"plugin"` 数组加载 TUI 插件，并且需要 `0.1.2` 这个版本，请显式锁定版本号：
 
@@ -127,7 +127,7 @@ bun install
 
 使用本地路径时，v2 会解析仓库根目录下物理存在的 `tui.js`，它再导出构建产物 `dist/index.js`；因此修改源码后需要运行 `bun run build`。
 
-#### OpenCode v1（legacy）
+#### OpenCode v1 版本线（长期维护）
 
 v1 的做法是在 `tui.json` 中直接引用源文件：
 

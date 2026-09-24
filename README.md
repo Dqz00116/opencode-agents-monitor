@@ -39,12 +39,12 @@ Once a session fans out across several tasks, it becomes hard to tell what is st
 
 ### Compatibility
 
-The two release lines use different plugin APIs and are not interchangeable: `0.2.x` targets the OpenCode v2 API (`@opencode/plugin@2`, `Plugin.define`), while `0.1.2` is the last release built for the v1 plugin shape (`@opencode-ai/plugin/tui`).
+The two release lines use different plugin APIs and are not interchangeable: `0.2.x` targets the OpenCode v2 API (`@opencode/plugin@2`, `Plugin.define`), while `0.1.2` targets the v1 plugin shape (`@opencode-ai/plugin/tui`). Both lines are actively maintained.
 
 | Plugin version | OpenCode version | Install | Configuration |
 | --- | --- | --- | --- |
 | `0.2.x` (`latest`) | v2 (`2.0.0+`) | `opencode plugin add opencode-agents-monitor` | Global `~/.config/opencode/cli.json` → `"plugins"` |
-| `0.1.2` (legacy, `opencode-v1` dist-tag) | v1 (`1.18.0+`) | `opencode plugin opencode-agents-monitor@0.1.2` | `tui.json` → `"plugin"` (global or project) |
+| `0.1.2` (v1 line, actively maintained; `opencode-v1` dist-tag) | v1 (`1.18.0+`) | `opencode plugin opencode-agents-monitor@0.1.2` | `tui.json` → `"plugin"` (global or project) |
 
 On npm, `latest` follows the `0.2.x` line, while `0.1.2` stays available under the `opencode-v1` dist-tag.
 
@@ -67,7 +67,7 @@ Or add it manually to the global `~/.config/opencode/cli.json`. In v2, TUI plugi
 Restart OpenCode after installation. The widget appears in the session sidebar; press `ctrl+x`, then `b` if the sidebar is hidden.
 
 <details>
-<summary>OpenCode v1 (legacy)</summary>
+<summary>OpenCode v1 line (actively maintained)</summary>
 
 OpenCode v1 loads TUI plugins from the `"plugin"` array in `tui.json` and needs the `0.1.2` release, so pin the version explicitly:
 
@@ -127,7 +127,7 @@ Point the global `~/.config/opencode/cli.json` at this checkout:
 
 For a local path, v2 resolves the physical `tui.js` in the repository root, which re-exports the build output `dist/index.js`, so run `bun run build` after changing the source.
 
-#### OpenCode v1 (legacy)
+#### OpenCode v1 line (actively maintained)
 
 On v1, reference the source file from `tui.json`:
 
