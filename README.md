@@ -37,26 +37,53 @@ Once a session fans out across several tasks, it becomes hard to tell what is st
 - **Details on demand:** keep rows compact, expand the ones you care about, or use `[view]` to open the full child session; press `up` to return
 - **History after a restart:** context and elapsed time for earlier agents are restored lazily from the API
 
+### Compatibility
+
+The two release lines use different plugin APIs and are not interchangeable: `0.2.x` targets the OpenCode v2 API (`@opencode/plugin@2`, `Plugin.define`), while `0.1.2` is the last release built for the v1 plugin shape (`@opencode-ai/plugin/tui`).
+
+| Plugin version | OpenCode version | Install | Configuration |
+| --- | --- | --- | --- |
+| `0.2.x` (`latest`) | v2 (`2.0.0+`) | `opencode plugin add opencode-agents-monitor` | Global `~/.config/opencode/cli.json` → `"plugins"` |
+| `0.1.2` (legacy, `opencode-v1` dist-tag) | v1 (`1.18.0+`) | `opencode plugin opencode-agents-monitor@0.1.2` | `tui.json` → `"plugin"` (global or project) |
+
+On npm, `latest` follows the `0.2.x` line, while `0.1.2` stays available under the `opencode-v1` dist-tag.
+
 ### Installation
 
-Requires OpenCode 1.18.0 or later.
+#### OpenCode v2
 
 ```bash
-opencode plugin opencode-agents-monitor
+opencode plugin add opencode-agents-monitor
+```
+
+Or add it manually to the global `~/.config/opencode/cli.json`. In v2, TUI plugins are configured only there; `tui.json` is no longer read:
+
+```json
+{
+  "plugins": ["opencode-agents-monitor"]
+}
 ```
 
 Restart OpenCode after installation. The widget appears in the session sidebar; press `ctrl+x`, then `b` if the sidebar is hidden.
 
 <details>
-<summary>Manual installation</summary>
+<summary>OpenCode v1 (legacy)</summary>
 
-Add to `~/.config/opencode/tui.json` (global) or `.opencode/tui.json` (project):
+OpenCode v1 loads TUI plugins from the `"plugin"` array in `tui.json` and needs the `0.1.2` release, so pin the version explicitly:
+
+```bash
+opencode plugin opencode-agents-monitor@0.1.2
+```
+
+Or add to `~/.config/opencode/tui.json` (global) or `.opencode/tui.json` (project):
 
 ```json
 {
-  "plugin": ["opencode-agents-monitor"]
+  "plugin": ["opencode-agents-monitor@0.1.2"]
 }
 ```
+
+Once the `opencode-v1` dist-tag is published, `opencode-agents-monitor@opencode-v1` resolves to the same release and can replace the pinned version above.
 
 </details>
 
@@ -88,13 +115,29 @@ cd opencode-agents-monitor
 bun install
 ```
 
-Reference the source from `tui.json` while developing locally:
+#### OpenCode v2
+
+Point the global `~/.config/opencode/cli.json` at this checkout:
+
+```json
+{
+  "plugins": ["/path/to/opencode-agents-monitor"]
+}
+```
+
+For a local path, v2 resolves the physical `tui.js` in the repository root, which re-exports the build output `dist/index.js`, so run `bun run build` after changing the source.
+
+#### OpenCode v1 (legacy)
+
+On v1, reference the source file from `tui.json`:
 
 ```json
 {
   "plugin": ["./path/to/opencode-agents-monitor/src/index.tsx"]
 }
 ```
+
+This applies to the v1 source line only; as of `0.2.0` the source targets the v2 API, so use the `0.1.2` release if you need to debug the v1 plugin.
 
 After changing the logo source, regenerate both variants with `node script/logo.mjs`.
 
@@ -107,7 +150,13 @@ bun install
 bun run build # writes dist/index.js
 ```
 
-Run `npm publish` after `npm login`. The source-based file-plugin setup above remains the recommended local development flow.
+Run `npm publish` after `npm login`. `0.2.0` goes to the `latest` dist-tag, while the v1 line is published under `opencode-v1`:
+
+```bash
+npm dist-tag add opencode-agents-monitor@0.1.2 opencode-v1
+```
+
+For local development, use the `tui.js` checkout path above on v2, or the source-based `tui.json` setup on the v1 line.
 
 ### License
 

@@ -37,26 +37,53 @@
 - **需要时再看细节：** 平时保持紧凑，点击展开关注的代理，或通过 `[view]` 打开完整子会话；按 `up` 即可返回
 - **重启后仍有历史信息：** 通过 API 按需补齐已有代理的上下文与耗时
 
+### 兼容性
+
+两条版本线使用不同的插件 API，互不通用：`0.2.x` 面向 OpenCode v2 API（`@opencode/plugin@2`、`Plugin.define`），`0.1.2` 则是最后一个基于 v1 插件形态（`@opencode-ai/plugin/tui`）的版本。
+
+| 插件版本 | OpenCode 版本 | 安装方式 | 配置文件 |
+| --- | --- | --- | --- |
+| `0.2.x`（`latest`） | v2（`2.0.0+`） | `opencode plugin add opencode-agents-monitor` | 全局 `~/.config/opencode/cli.json` → `"plugins"` |
+| `0.1.2`（legacy，`opencode-v1` dist-tag） | v1（`1.18.0+`） | `opencode plugin opencode-agents-monitor@0.1.2` | `tui.json` → `"plugin"`（全局或项目级） |
+
+npm 上 `latest` 跟随 `0.2.x` 版本线，`0.1.2` 则保留在 `opencode-v1` dist-tag 下。
+
 ### 安装
 
-需要 OpenCode 1.18.0 或更高版本。
+#### OpenCode v2
 
 ```bash
-opencode plugin opencode-agents-monitor
+opencode plugin add opencode-agents-monitor
+```
+
+也可以手动写入全局 `~/.config/opencode/cli.json`。v2 的 TUI 插件只在这里配置，不再读取 `tui.json`：
+
+```json
+{
+  "plugins": ["opencode-agents-monitor"]
+}
 ```
 
 安装后重启 OpenCode。组件会出现在会话侧栏中；如果侧栏处于隐藏状态，先按 `ctrl+x`，再按 `b` 打开。
 
 <details>
-<summary>手动安装</summary>
+<summary>OpenCode v1（legacy）</summary>
+
+OpenCode v1 通过 `tui.json` 的 `"plugin"` 数组加载 TUI 插件，并且需要 `0.1.2` 这个版本，请显式锁定版本号：
+
+```bash
+opencode plugin opencode-agents-monitor@0.1.2
+```
 
 在 `~/.config/opencode/tui.json`（全局）或 `.opencode/tui.json`（项目级）中添加：
 
 ```json
 {
-  "plugin": ["opencode-agents-monitor"]
+  "plugin": ["opencode-agents-monitor@0.1.2"]
 }
 ```
+
+`opencode-v1` dist-tag 发布后，`opencode-agents-monitor@opencode-v1` 会指向同一版本，可用来替代上面固定的版本号。
 
 </details>
 
@@ -88,13 +115,29 @@ cd opencode-agents-monitor
 bun install
 ```
 
-本地开发时，在 `tui.json` 中直接引用源文件：
+#### OpenCode v2
+
+在全局 `~/.config/opencode/cli.json` 中指向本仓库目录：
+
+```json
+{
+  "plugins": ["/path/to/opencode-agents-monitor"]
+}
+```
+
+使用本地路径时，v2 会解析仓库根目录下物理存在的 `tui.js`，它再导出构建产物 `dist/index.js`；因此修改源码后需要运行 `bun run build`。
+
+#### OpenCode v1（legacy）
+
+v1 的做法是在 `tui.json` 中直接引用源文件：
 
 ```json
 {
   "plugin": ["./path/to/opencode-agents-monitor/src/index.tsx"]
 }
 ```
+
+该方式仅适用于 v1 源码线；从 `0.2.0` 起源码已迁移到 v2 API，如需调试 v1 插件请使用 `0.1.2` 版本。
 
 修改 Logo 源码后，运行 `node script/logo.mjs` 重新生成亮色和暗色版本。
 
@@ -107,7 +150,13 @@ bun install
 bun run build # 生成 dist/index.js
 ```
 
-先运行 `npm login`，再执行 `npm publish`。本地开发仍建议使用上面的源文件插件方式。
+先运行 `npm login`，再执行 `npm publish`。`0.2.0` 发布到 `latest` dist-tag，v1 版本线则发布在 `opencode-v1` 下：
+
+```bash
+npm dist-tag add opencode-agents-monitor@0.1.2 opencode-v1
+```
+
+本地开发时，v2 请使用上面的 `tui.js` 路径方式，v1 版本线仍使用 `tui.json` 源文件方式。
 
 ### 许可证
 
