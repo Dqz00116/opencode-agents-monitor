@@ -43,24 +43,26 @@
 
 | 插件版本 | OpenCode 版本 | 安装方式 | 配置文件 |
 | --- | --- | --- | --- |
-| `0.2.x`（`latest`） | v2（`2.0.0+`） | `opencode plugin add opencode-agents-monitor` | 全局 `~/.config/opencode/cli.json` → `"plugins"` |
+| `0.2.x`（`beta` tag：`0.2.0-beta.0`） | v2（`2.0.0+`） | `opencode plugin add opencode-agents-monitor@beta` | 全局 `~/.config/opencode/cli.json` → `"plugins"` |
 | `0.1.2`（v1 版本线，长期维护，`opencode-v1` dist-tag） | v1（`1.18.0+`） | `opencode plugin opencode-agents-monitor@0.1.2` | `tui.json` → `"plugin"`（全局或项目级） |
 
-npm 上 `latest` 跟随 `0.2.x` 版本线，`0.1.2` 则保留在 `opencode-v1` dist-tag 下。
+npm 上 `0.2.x` 目前发布在 `beta` tag 下（`0.2.0-beta.0`），正式版发布后 `latest` 才会跟随 `0.2.x` 版本线；`0.1.2` 则保留在 `opencode-v1` dist-tag 下。
 
 ### 安装
 
 #### OpenCode v2
 
+`0.2.0` 目前发布在 `beta` dist-tag 下（`0.2.0-beta.0`），请使用 `@beta` 安装；正式版发布到 `latest` 后即可去掉 `@beta` 后缀。
+
 ```bash
-opencode plugin add opencode-agents-monitor
+opencode plugin add opencode-agents-monitor@beta
 ```
 
 也可以手动写入全局 `~/.config/opencode/cli.json`。v2 的 TUI 插件只在这里配置，不再读取 `tui.json`：
 
 ```json
 {
-  "plugins": ["opencode-agents-monitor"]
+  "plugins": ["opencode-agents-monitor@beta"]
 }
 ```
 

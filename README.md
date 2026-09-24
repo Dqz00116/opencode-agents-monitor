@@ -43,24 +43,26 @@ The two release lines use different plugin APIs and are not interchangeable: `0.
 
 | Plugin version | OpenCode version | Install | Configuration |
 | --- | --- | --- | --- |
-| `0.2.x` (`latest`) | v2 (`2.0.0+`) | `opencode plugin add opencode-agents-monitor` | Global `~/.config/opencode/cli.json` → `"plugins"` |
+| `0.2.x` (`beta` tag: `0.2.0-beta.0`) | v2 (`2.0.0+`) | `opencode plugin add opencode-agents-monitor@beta` | Global `~/.config/opencode/cli.json` → `"plugins"` |
 | `0.1.2` (v1 line, actively maintained; `opencode-v1` dist-tag) | v1 (`1.18.0+`) | `opencode plugin opencode-agents-monitor@0.1.2` | `tui.json` → `"plugin"` (global or project) |
 
-On npm, `latest` follows the `0.2.x` line, while `0.1.2` stays available under the `opencode-v1` dist-tag.
+On npm, `0.2.x` is currently published under the `beta` tag (`0.2.0-beta.0`); once the stable `0.2.0` release ships, `latest` will follow the `0.2.x` line. `0.1.2` stays available under the `opencode-v1` dist-tag.
 
 ### Installation
 
 #### OpenCode v2
 
+`0.2.0` is currently published under the `beta` dist-tag (`0.2.0-beta.0`), so install with `@beta`; once the stable release lands on `latest`, the `@beta` suffix can be dropped.
+
 ```bash
-opencode plugin add opencode-agents-monitor
+opencode plugin add opencode-agents-monitor@beta
 ```
 
 Or add it manually to the global `~/.config/opencode/cli.json`. In v2, TUI plugins are configured only there; `tui.json` is no longer read:
 
 ```json
 {
-  "plugins": ["opencode-agents-monitor"]
+  "plugins": ["opencode-agents-monitor@beta"]
 }
 ```
 
