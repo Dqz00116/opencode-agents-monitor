@@ -32,7 +32,8 @@
     "tui.js"
   ],
   "scripts": {
-    "build": "bun run script/build.mjs"
+    "build": "bun run script/build.mjs",
+    "prepublishOnly": "bun run build"
   },
   "dependencies": {
     "@opencode/plugin": "^2.0.15",
