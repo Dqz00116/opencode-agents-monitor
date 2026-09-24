@@ -30,7 +30,7 @@ Expand an agent for its model, current tool, and cost. When you need the full st
 > | Plugin version | OpenCode version | Install | Configuration |
 > | --- | --- | --- | --- |
 > | `0.1.2` (this branch, `main`) | v1 (`1.18.0+`) | `opencode plugin opencode-agents-monitor@0.1.2` | `tui.json` → `"plugin"` (global or project) |
-> | `0.2.x` ([`feat/v2`](https://github.com/Dqz00116/opencode-agents-monitor/tree/feat/v2) branch, not yet published to npm) | v2 (`2.0.0+`) | `opencode plugin add opencode-agents-monitor` | Global `~/.config/opencode/cli.json` → `"plugins"` |
+> | `0.2.x` ([`feat/v2`](https://github.com/Dqz00116/opencode-agents-monitor/tree/feat/v2) branch; available on npm under the `beta` tag) | v2 (`2.0.0+`) | `opencode plugin add opencode-agents-monitor@beta` (the stable `0.2.0` release will move to `latest`) | Global `~/.config/opencode/cli.json` → `"plugins"` |
 >
 > - **Running OpenCode v1?** You are in the right place — see [Installation](#installation) below.
 > - **Running OpenCode v2?** Use the `0.2.x` line from the [`feat/v2`](https://github.com/Dqz00116/opencode-agents-monitor/tree/feat/v2) branch.

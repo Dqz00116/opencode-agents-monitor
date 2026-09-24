@@ -30,7 +30,7 @@
 > | 插件版本 | OpenCode 版本 | 安装方式 | 配置文件 |
 > | --- | --- | --- | --- |
 > | `0.1.2`（当前分支 `main`） | v1（`1.18.0+`） | `opencode plugin opencode-agents-monitor@0.1.2` | `tui.json` → `"plugin"`（全局或项目级） |
-> | `0.2.x`（[`feat/v2`](https://github.com/Dqz00116/opencode-agents-monitor/tree/feat/v2) 分支，尚未发布到 npm） | v2（`2.0.0+`） | `opencode plugin add opencode-agents-monitor` | 全局 `~/.config/opencode/cli.json` → `"plugins"` |
+> | `0.2.x`（[`feat/v2`](https://github.com/Dqz00116/opencode-agents-monitor/tree/feat/v2) 分支，npm `@beta` tag 已可用） | v2（`2.0.0+`） | `opencode plugin add opencode-agents-monitor@beta`（0.2.0 正式版将推上 `latest`） | 全局 `~/.config/opencode/cli.json` → `"plugins"` |
 >
 > - **使用 OpenCode v1？** 你正在正确的分支上，请按下方[安装](#安装)步骤操作。
 > - **使用 OpenCode v2？** 请使用 [`feat/v2`](https://github.com/Dqz00116/opencode-agents-monitor/tree/feat/v2) 分支上的 `0.2.x` 版本线。
