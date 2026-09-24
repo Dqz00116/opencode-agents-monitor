@@ -24,6 +24,17 @@ Expand an agent for its model, current tool, and cost. When you need the full st
   <img src="assets/opencode-agents-monitor.gif" alt="Agents sidebar tracking active and completed OpenCode sub-agents">
 </p>
 
+> [!IMPORTANT]
+> **OpenCode v1 and v2 use incompatible plugin APIs.** A plugin built for one cannot run on the other. This project maintains two release lines, and **both are supported long-term** — the v1 line keeps receiving bug fixes:
+>
+> | Plugin version | OpenCode version | Install | Configuration |
+> | --- | --- | --- | --- |
+> | `0.1.2` (this branch, `main`) | v1 (`1.18.0+`) | `opencode plugin opencode-agents-monitor@0.1.2` | `tui.json` → `"plugin"` (global or project) |
+> | `0.2.x` ([`feat/v2`](https://github.com/Dqz00116/opencode-agents-monitor/tree/feat/v2) branch, not yet published to npm) | v2 (`2.0.0+`) | `opencode plugin add opencode-agents-monitor` | Global `~/.config/opencode/cli.json` → `"plugins"` |
+>
+> - **Running OpenCode v1?** You are in the right place — see [Installation](#installation) below.
+> - **Running OpenCode v2?** Use the `0.2.x` line from the [`feat/v2`](https://github.com/Dqz00116/opencode-agents-monitor/tree/feat/v2) branch.
+
 ### Why use it?
 
 Once a session fans out across several tasks, it becomes hard to tell what is still moving and what has already finished. The widget keeps that picture visible: active work updates in real time, completed agents move out of the way, and earlier child sessions reappear when the TUI starts.
@@ -39,11 +50,13 @@ Once a session fans out across several tasks, it becomes hard to tell what is st
 
 ### Installation
 
-Requires OpenCode 1.18.0 or later.
+This branch is the OpenCode v1 line and requires OpenCode 1.18.0 or later. Pin `0.1.2` explicitly so a future v2 release on the `latest` dist-tag is never installed into a v1 host:
 
 ```bash
-opencode plugin opencode-agents-monitor
+opencode plugin opencode-agents-monitor@0.1.2
 ```
+
+Once the `opencode-v1` dist-tag is published, `opencode-agents-monitor@opencode-v1` resolves to this line and can replace the pinned version above.
 
 Restart OpenCode after installation. The widget appears in the session sidebar; press `ctrl+x`, then `b` if the sidebar is hidden.
 
@@ -54,11 +67,13 @@ Add to `~/.config/opencode/tui.json` (global) or `.opencode/tui.json` (project):
 
 ```json
 {
-  "plugin": ["opencode-agents-monitor"]
+  "plugin": ["opencode-agents-monitor@0.1.2"]
 }
 ```
 
 </details>
+
+On OpenCode v2, use the `0.2.x` line from the [`feat/v2`](https://github.com/Dqz00116/opencode-agents-monitor/tree/feat/v2) branch instead.
 
 ### Usage
 

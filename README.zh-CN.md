@@ -24,6 +24,17 @@
   <img src="assets/opencode-agents-monitor.gif" alt="Agents 侧栏正在追踪活动与已完成的 OpenCode 子代理">
 </p>
 
+> [!IMPORTANT]
+> **OpenCode v1 与 v2 的插件 API 互不兼容**：为其中一个版本构建的插件无法在另一个版本中运行。本项目维护两条版本线，**两条线都会长期维护支持**——v1 线会继续接收 bug 修复：
+>
+> | 插件版本 | OpenCode 版本 | 安装方式 | 配置文件 |
+> | --- | --- | --- | --- |
+> | `0.1.2`（当前分支 `main`） | v1（`1.18.0+`） | `opencode plugin opencode-agents-monitor@0.1.2` | `tui.json` → `"plugin"`（全局或项目级） |
+> | `0.2.x`（[`feat/v2`](https://github.com/Dqz00116/opencode-agents-monitor/tree/feat/v2) 分支，尚未发布到 npm） | v2（`2.0.0+`） | `opencode plugin add opencode-agents-monitor` | 全局 `~/.config/opencode/cli.json` → `"plugins"` |
+>
+> - **使用 OpenCode v1？** 你正在正确的分支上，请按下方[安装](#安装)步骤操作。
+> - **使用 OpenCode v2？** 请使用 [`feat/v2`](https://github.com/Dqz00116/opencode-agents-monitor/tree/feat/v2) 分支上的 `0.2.x` 版本线。
+
 ### 为什么需要它？
 
 当一个会话同时派出多个任务，很快就会难以分辨哪些仍在推进、哪些已经结束。这个组件会把整体进度留在侧栏：活动状态实时更新，完成的代理自动收起，TUI 启动前已有的子会话也会重新显示。
@@ -39,11 +50,13 @@
 
 ### 安装
 
-需要 OpenCode 1.18.0 或更高版本。
+当前分支是 OpenCode v1 版本线，需要 OpenCode 1.18.0 或更高版本。请显式锁定 `0.1.2`，避免未来 `latest` 标签上的 v2 版本被安装进 v1 环境：
 
 ```bash
-opencode plugin opencode-agents-monitor
+opencode plugin opencode-agents-monitor@0.1.2
 ```
+
+`opencode-v1` dist-tag 发布后，`opencode-agents-monitor@opencode-v1` 会指向本条版本线，可用来替代上面锁定的版本号。
 
 安装后重启 OpenCode。组件会出现在会话侧栏中；如果侧栏处于隐藏状态，先按 `ctrl+x`，再按 `b` 打开。
 
@@ -54,11 +67,13 @@ opencode plugin opencode-agents-monitor
 
 ```json
 {
-  "plugin": ["opencode-agents-monitor"]
+  "plugin": ["opencode-agents-monitor@0.1.2"]
 }
 ```
 
 </details>
+
+使用 OpenCode v2 时，请改用 [`feat/v2`](https://github.com/Dqz00116/opencode-agents-monitor/tree/feat/v2) 分支上的 `0.2.x` 版本线。
 
 ### 使用
 
