@@ -7,14 +7,16 @@ type Context = ReturnType<typeof usePlugin>
 
 type Run = { start: number; end?: number }
 
+type Node = { session: SessionInfo; depth: number }
+
 const STORAGE_KEY = "agents_sidebar"
 const ARCHIVED_PAGE_SIZE = 10
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" })
 
 type Tracker = {
-  active: (parentID: string) => SessionInfo[]
-  archived: (parentID: string) => SessionInfo[]
+  active: (parentID: string) => Node[]
+  archived: (parentID: string) => Node[]
   run: (sessionID: string) => Run | undefined
   now: () => number
   breathing: () => number
@@ -87,6 +89,28 @@ function createTracker(context: Context): { tracker: Tracker; dispose: () => voi
       return now() - session.time.created >= 30_000
     }
 
+    // Full-subtree walk: direct children first (creation order), then each
+    // child's own descendants. Depth 0 = direct child of the viewed session.
+    function descendants(parentID: string): Node[] {
+      const byParent = new Map<string, SessionInfo[]>()
+      for (const session of context.data.session.list()) {
+        if (!session.parentID) continue
+        const bucket = byParent.get(session.parentID) ?? []
+        bucket.push(session)
+        byParent.set(session.parentID, bucket)
+      }
+      const out: Node[] = []
+      const walk = (id: string, depth: number) => {
+        const kids = (byParent.get(id) ?? []).sort((a, b) => a.time.created - b.time.created)
+        for (const kid of kids) {
+          out.push({ session: kid, depth })
+          walk(kid.id, depth + 1)
+        }
+      }
+      walk(parentID, 0)
+      return out
+    }
+
     function hydrate(sessionID: string) {
       if (hydrated.has(sessionID)) return
       hydrated.add(sessionID)
@@ -131,16 +155,12 @@ function createTracker(context: Context): { tracker: Tracker; dispose: () => voi
       dispose,
       tracker: {
         active(parentID) {
-          return context.data.session
-            .list()
-            .filter((session) => session.parentID === parentID && !isDone(session))
-            .sort((a, b) => a.time.created - b.time.created)
+          return descendants(parentID)
+            .filter((node) => !isDone(node.session))
         },
         archived(parentID) {
-          return context.data.session
-            .list()
-            .filter((session) => session.parentID === parentID && isDone(session))
-            .sort((a, b) => (runs()[b.id]?.end ?? b.time.updated) - (runs()[a.id]?.end ?? a.time.updated))
+          return descendants(parentID)
+            .filter((node) => isDone(node.session))
         },
         run(sessionID) {
           return runs()[sessionID]
@@ -171,16 +191,12 @@ function createTracker(context: Context): { tracker: Tracker; dispose: () => voi
           setExpandedMap((current) => ({ ...current, [sessionID]: next }))
         },
         archivedPage(sessionID) {
-          const total = context.data.session
-            .list()
-            .filter((session) => session.parentID === sessionID && isDone(session)).length
+          const total = descendants(sessionID).filter((node) => isDone(node.session)).length
           const pages = Math.max(1, Math.ceil(total / ARCHIVED_PAGE_SIZE))
           return Math.min(archivedPageMap()[sessionID] ?? 0, pages - 1)
         },
         setArchivedPage(sessionID, page) {
-          const total = context.data.session
-            .list()
-            .filter((session) => session.parentID === sessionID && isDone(session)).length
+          const total = descendants(sessionID).filter((node) => isDone(node.session)).length
           const pages = Math.max(1, Math.ceil(total / ARCHIVED_PAGE_SIZE))
           const clamped = Math.max(0, Math.min(page, pages - 1))
           setArchivedPageMap((current) => ({ ...current, [sessionID]: clamped }))
@@ -190,7 +206,7 @@ function createTracker(context: Context): { tracker: Tracker; dispose: () => voi
   })
 }
 
-function Agent(props: { tracker: Tracker; session: SessionInfo }) {
+function Agent(props: { tracker: Tracker; session: SessionInfo; depth: number }) {
   const context = usePlugin()
   const theme = () => context.theme
 
@@ -263,6 +279,9 @@ function Agent(props: { tracker: Tracker; session: SessionInfo }) {
           <text fg={theme().text.base}>
             <b>[{agentName(props.session)}]</b>
           </text>
+          <Show when={props.depth > 0}>
+            <text fg={theme().text.muted}>L{props.depth + 1}</text>
+          </Show>
           <text fg={theme().text.muted}>
             {stateAbbr()} {ctx() !== undefined ? formatTokens(ctx()!) : "-"}{" "}
             {elapsedMs() !== undefined ? formatElapsed(elapsedMs()!) : "-"}
@@ -272,7 +291,7 @@ function Agent(props: { tracker: Tracker; session: SessionInfo }) {
           <text fg={theme().hue.interactive[200]}>[view]</text>
         </box>
       </box>
-      <text fg={theme().text.muted}>  {agentDesc(props.session)}</text>
+      <text fg={theme().text.muted}>{"  ".repeat(props.depth)}↳ {agentDesc(props.session)}</text>
       <Show when={open()}>
         <text fg={theme().text.muted}>  model: {model()}</text>
         <text fg={theme().text.muted}>  tool: {tool() ? toolSummary(tool()!) : "-"}</text>
@@ -294,6 +313,12 @@ function View(props: { tracker: Tracker; session_id: string }) {
     const start = archivedPage() * ARCHIVED_PAGE_SIZE
     return archived().slice(start, start + ARCHIVED_PAGE_SIZE)
   })
+  const maxDepth = () => {
+    let depth = 0
+    for (const node of active()) depth = Math.max(depth, node.depth)
+    for (const node of archived()) depth = Math.max(depth, node.depth)
+    return depth
+  }
 
   return (
     <box marginBottom={1}>
@@ -304,12 +329,13 @@ function View(props: { tracker: Tracker; session_id: string }) {
         </text>
         <text fg={theme().text.muted}>
           {active().length} active {archived().length} done
+          <Show when={maxDepth() > 0}> · {maxDepth() + 1} levels</Show>
         </text>
       </box>
       <Show when={!props.tracker.collapsed()}>
         <Show when={total() > 0} fallback={<text fg={theme().text.muted}>No subagents yet</text>}>
           <For each={active()}>
-            {(child) => <Agent tracker={props.tracker} session={child} />}
+            {(node) => <Agent tracker={props.tracker} session={node.session} depth={node.depth} />}
           </For>
           <Show when={archived().length > 0}>
             <box flexDirection="row" gap={1} onMouseDown={() => props.tracker.toggleArchived()}>
@@ -318,7 +344,7 @@ function View(props: { tracker: Tracker; session_id: string }) {
             </box>
             <Show when={props.tracker.showArchived()}>
               <For each={archivedItems()}>
-                {(child) => <Agent tracker={props.tracker} session={child} />}
+                {(node) => <Agent tracker={props.tracker} session={node.session} depth={node.depth} />}
               </For>
               <Show when={archivedTotalPages() > 1}>
                 <box flexDirection="row" gap={1}>
